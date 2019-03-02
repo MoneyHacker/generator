@@ -117,19 +117,6 @@ public class Column {
 	 *            Describe what the parameter does
 	 * @param isUnique
 	 *            Describe what the parameter does
-	 * @todo-javadoc Write javadocs for method parameter
-	 * @todo-javadoc Write javadocs for method parameter
-	 * @todo-javadoc Write javadocs for constructor
-	 * @todo-javadoc Write javadocs for method parameter
-	 * @todo-javadoc Write javadocs for method parameter
-	 * @todo-javadoc Write javadocs for method parameter
-	 * @todo-javadoc Write javadocs for method parameter
-	 * @todo-javadoc Write javadocs for method parameter
-	 * @todo-javadoc Write javadocs for method parameter
-	 * @todo-javadoc Write javadocs for method parameter
-	 * @todo-javadoc Write javadocs for method parameter
-	 * @todo-javadoc Write javadocs for method parameter
-	 * @todo-javadoc Write javadocs for method parameter
 	 */
 	public Column(Table table, int sqlType, String sqlTypeName,
 			String sqlName, int size, int decimalDigits, boolean isPk,
@@ -268,8 +255,6 @@ public class Column {
 	 * Describe what the method does
 	 * 
 	 * @return Describe the return value
-	 * @todo-javadoc Write javadocs for method
-	 * @todo-javadoc Write javadocs for return value
 	 */
 	@Override
 	public int hashCode() {
@@ -282,9 +267,6 @@ public class Column {
 	 * @param o
 	 *            Describe what the parameter does
 	 * @return Describe the return value
-	 * @todo-javadoc Write javadocs for method
-	 * @todo-javadoc Write javadocs for method parameter
-	 * @todo-javadoc Write javadocs for return value
 	 */
 	@Override
 	public boolean equals(Object o) {
@@ -296,8 +278,6 @@ public class Column {
 	 * Describe what the method does
 	 * 
 	 * @return Describe the return value
-	 * @todo-javadoc Write javadocs for method
-	 * @todo-javadoc Write javadocs for return value
 	 */
 	@Override
 	public String toString() {
@@ -315,8 +295,6 @@ public class Column {
 	 * Describe what the method does
 	 * 
 	 * @return Describe the return value
-	 * @todo-javadoc Write javadocs for method
-	 * @todo-javadoc Write javadocs for return value
 	 */
 	protected final String prefsPrefix() {
 		return "tables/" + getTable().getSqlName() + "/columns/" + getSqlName();

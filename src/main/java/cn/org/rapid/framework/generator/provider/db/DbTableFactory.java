@@ -89,11 +89,9 @@ public class DbTableFactory {
 			final Table table = new Table();
 			table.setTableName(realTableName);
 			table.setRemarks(remarks);
-			
 			if ("SYNONYM".equals(tableType) && isOracleDataBase()) {
 			    table.setOwnerSynonymName(getSynonymOwner(realTableName));
 			}
-			
 			retriveTableColumns(table);
 			DatabaseMetaData dmd = conn.getMetaData();
 			System.out.println("conn="+conn.isClosed());
@@ -213,11 +211,8 @@ public class DbTableFactory {
 	
 	private void retriveTableColumns(final Table table) throws SQLException {
 	      log.debug("-------setColumns(" + table.getSqlName() + ")");
-
 	      final List primaryKeys = getTablePrimaryKeys(table);
-	      
 	      table.setPrimaryKeyColumns(primaryKeys);
-	      
 	      // get the indices and unique columns
 	      final List indices = new LinkedList();
 	      // maps index names to a list of columns in the index
@@ -225,13 +220,10 @@ public class DbTableFactory {
 	      // maps column names to the index name.
 	      final Map uniqueColumns = new HashMap();
 	      ResultSet indexRs = null;
-
 	      try {
-
 	         if (table.getOwnerSynonymName() != null) {
 	            indexRs = getMetaData().getIndexInfo(getCatalog(), table.getOwnerSynonymName(), table.getSqlName(), false, true);
-	         }
-	         else {
+	         } else {
 	            indexRs = getMetaData().getIndexInfo(getCatalog(), getSchema(), table.getSqlName(), false, true);
 	         }
 	         while (indexRs.next()) {
