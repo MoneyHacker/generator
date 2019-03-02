@@ -1,0 +1,205 @@
+
+<#assign className = table.className>
+<#assign classNameLower = className?uncap_first>
+<#macro getPkColumn><#list table.columns as column><#if column.pk>${column.javaType}</#if></#list></#macro>
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="${className}Mapper">
+	<resultMap id="BaseResultMap" type="${basepackage}.model.${className}">
+		<#list table.columns as column>
+		<#if column.pk>
+		<id column="${column.sqlName}" property="${column.columnNameLower}" jdbcType="${column.jdbcSqlTypeName}" />
+		<#else>
+		<result column="${column.sqlName}" property="${column.columnNameLower}" jdbcType="${column.jdbcSqlTypeName}" />
+		</#if>
+		</#list>
+	</resultMap>
+	<sql id="Base_Where">
+		<#list table.columns as column>
+		<#if "${column.jdbcSqlTypeName}"=="VARCHAR">
+		<if test="${column.columnNameLower} != null and ${column.columnNameLower} !=''"> and ${column.sqlName}= ${"#{"}${column.columnNameLower}${"}"}</if>
+		<#elseif "${column.jdbcSqlTypeName}"=="LONGVARCHAR">
+		<if test="${column.columnNameLower} != null and ${column.columnNameLower} !=''"> and ${column.sqlName}= ${"#{"}${column.columnNameLower}${"}"}</if>
+		<#elseif "${column.jdbcSqlTypeName}"=="TEXT">
+		<if test="${column.columnNameLower} != null and ${column.columnNameLower} !=''"> and ${column.sqlName}= ${"#{"}${column.columnNameLower}${"}"}</if>	
+		<#else>
+		<if test="${column.columnNameLower} != null"> and ${column.sqlName}= ${"#{"}${column.columnNameLower}${"}"}</if>	
+		</#if>
+		</#list>
+	</sql>
+	<sql id="Base_Column_List">
+		<#list table.columns as column>
+		${column.sqlName} <#if column_has_next>,</#if>
+		</#list>
+	</sql>
+
+	<select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.<@getPkColumn/>">
+		select
+		<include refid="Base_Column_List" />
+		from ${table.sqlName}
+		where
+		<#list table.columns as column>
+		<#if column.pk>
+		${column.sqlName} = ${"#{"}${column.columnNameLower}${",jdbcType="}${column.jdbcSqlTypeName}${"}"}
+		</#if>
+		</#list>
+	</select>
+
+	<delete id="deleteByPrimaryKey" parameterType="java.lang.<@getPkColumn/>">
+		delete from ${table.sqlName}
+		where
+		<#list table.columns as column>
+		<#if column.pk>
+		${column.sqlName} = ${"#{"}${column.columnNameLower}${",jdbcType="}${column.jdbcSqlTypeName}${"}"}
+		</#if>
+		</#list>
+	</delete>
+
+	<insert id="insertSelective" parameterType="${basepackage}.model.${className}">
+		insert into ${table.sqlName}
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<#list table.columns as column>
+			<#if "${column.jdbcSqlTypeName}"=="VARCHAR">
+			<if test="${column.columnNameLower} != null and ${column.columnNameLower} !=''">${column.sqlName},</if>
+			<#elseif "${column.jdbcSqlTypeName}"=="LONGVARCHAR">
+			<if test="${column.columnNameLower} != null and ${column.columnNameLower} !=''">${column.sqlName},</if>
+			<#elseif "${column.jdbcSqlTypeName}"=="TEXT">
+			<if test="${column.columnNameLower} != null and ${column.columnNameLower} !=''">${column.sqlName},</if>	
+			<#else>
+			<if test="${column.columnNameLower} != null">${column.sqlName},</if>	
+			</#if>	
+			</#list>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<#list table.columns as column>
+			<#if "${column.jdbcSqlTypeName}"=="VARCHAR">
+			<if test="${column.columnNameLower} != null and ${column.columnNameLower} !=''">
+				${"#{"}${column.columnNameLower}${",jdbcType="}${column.jdbcSqlTypeName}${"},"}
+			</if>
+			<#elseif "${column.jdbcSqlTypeName}"=="LONGVARCHAR">
+			<if test="${column.columnNameLower} != null and ${column.columnNameLower} !=''">
+				${"#{"}${column.columnNameLower}${",jdbcType="}${column.jdbcSqlTypeName}${"},"}
+			</if>
+			<#elseif "${column.jdbcSqlTypeName}"=="TEXT">
+			<if test="${column.columnNameLower} != null and ${column.columnNameLower} !=''">
+				${"#{"}${column.columnNameLower}${",jdbcType="}${column.jdbcSqlTypeName}${"},"}
+			</if>
+			<#else>
+			<if test="${column.columnNameLower} != null">
+				${"#{"}${column.columnNameLower}${",jdbcType="}${column.jdbcSqlTypeName}${"},"}
+			</if>
+			</#if>
+			</#list>
+		</trim>
+	</insert>
+<insert id="insertBatch" parameterType="java.util.List">
+	insert into ${table.sqlName} (
+			<#list table.columns as column>${column.sqlName} <#if column_has_next>,</#if></#list>)
+		values
+	<foreach collection="list" item="item" index="index" separator="," >
+	(<#list table.columns as column>
+	#${r"{item."}${column.columnNameLower}${"}"}<#if column_has_next>,</#if>
+	</#list>)
+	</foreach>
+</insert>
+
+	<update id="updateByPrimaryKeySelective" parameterType="${basepackage}.model.${className}">
+		update ${table.sqlName}
+		<set>
+			<#list table.columns as column>
+			<#if !column.pk>
+			<#if "${column.jdbcSqlTypeName}"=="VARCHAR">
+			<if test="${column.columnNameLower} != null and ${column.columnNameLower} !=''">
+				${column.sqlName}= ${"#{"}${column.columnNameLower}${",jdbcType="}${column.jdbcSqlTypeName}${"}"}<#if column_has_next>,</#if>
+			</if>
+			<#elseif "${column.jdbcSqlTypeName}"=="LONGVARCHAR">
+			<if test="${column.columnNameLower} != null and ${column.columnNameLower} !=''">
+				${column.sqlName}= ${"#{"}${column.columnNameLower}${",jdbcType="}${column.jdbcSqlTypeName}${"}"}<#if column_has_next>,</#if>
+			</if>
+			<#elseif "${column.jdbcSqlTypeName}"=="TEXT">
+			<if test="${column.columnNameLower} != null and ${column.columnNameLower} !=''">
+				${column.sqlName}= ${"#{"}${column.columnNameLower}${",jdbcType="}${column.jdbcSqlTypeName}${"}"}<#if column_has_next>,</#if>
+			</if>
+			<#else>
+			<if test="${column.columnNameLower} != null">
+				${column.sqlName}= ${"#{"}${column.columnNameLower}${",jdbcType="}${column.jdbcSqlTypeName}${"}"}<#if column_has_next>,</#if>
+			</if>
+			</#if>
+			</#if>
+			</#list>
+		</set>
+		where
+		<#list table.columns as column>
+		<#if column.pk>
+		${column.sqlName} = ${"#{"}${column.columnNameLower}${",jdbcType="}${column.jdbcSqlTypeName}${"}"}
+		</#if>
+		</#list>
+	</update>
+
+	<select id="getAll" resultMap="BaseResultMap" parameterType="map">
+		select
+		<include refid="Base_Column_List" />
+		from ${table.sqlName} where 1=1
+		<include refid="Base_Where" />
+	</select>
+	<select id="pageCount" resultType="java.lang.Integer" parameterType="map">
+		select count(1) from ${table.sqlName} where 1=1
+		<include refid="Base_Where" />
+	</select>
+	<select id="pageData" resultMap="BaseResultMap" parameterType="map">
+		select
+		<include refid="Base_Column_List" />
+		from ${table.sqlName} where 1=1
+		<include refid="Base_Where" />
+	</select>
+
+	<select id="selectByIds" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from ${table.sqlName} where <#list table.columns as column><#if column.pk>${column.sqlName}</#if></#list> in
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			${"#{"}item${"}"}
+		</foreach>
+	</select>
+	
+	 <delete id="deleteByMap" parameterType="map" >
+  		delete from ${table.sqlName} where 1=1 <include refid="Base_Where" />
+ 	 </delete>
+  
+  <delete id="deleteByIds"  parameterType="map">
+		delete from ${table.sqlName} where <#list table.columns as column><#if column.pk>${column.sqlName}</#if></#list> in
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			${"#{"}item${"}"}
+		</foreach>
+	</delete>
+
+<select id="selectByField" resultMap="BaseResultMap">
+select <include refid="Base_Column_List" /> from ${table.sqlName} where ${r"${_fieldName}"} in
+ <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+	 ${"#{"}item${"}"}
+ </foreach>
+</select>
+
+<select id="getMinIdAndMaxId" resultType="map" parameterType="map">
+<#compress>
+select
+<#list table.columns as column>
+<#if column.pk> min(${column.sqlName}) minId, max(${column.sqlName}) maxId </#if>
+</#list>
+        from ${table.sqlName} where 1=1
+</#compress>
+   <include refid="Base_Where"/>
+</select>
+
+ <!-- 根据分页参数和其它条件,通过id获取分页数据,只通过主键大于 ,而没有用between,避免查询到空数据  order by 主键升序  -->
+
+<select id="getDataList" resultMap="BaseResultMap" parameterType="map">
+select
+<include refid="Base_Column_List"/>
+from ${table.sqlName} where
+<#list table.columns as column><#if column.pk>${column.sqlName} ${r"<![CDATA[ >= ]]>"} ${r"#{startIndex}"}</#if></#list>
+<include refid="Base_Where"/>
+   order by <#list table.columns as column><#if column.pk> ${column.sqlName} </#if></#list> asc
+        limit  ${r"#{batchSize}"}
+</select>
+</mapper>
